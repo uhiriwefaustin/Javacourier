@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Manage Companies')}"></head>
+<body>
+
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary-custom"><i class="fa-solid fa-building me-2"></i> Manage Companies</h2>
+        <button class="btn btn-accent px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#companyModal">
+            <i class="fa-solid fa-plus me-1"></i> New Company
+        </button>
+    </div>
+
+    <div class="card card-custom border-0 p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="companiesTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Headquarters</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal fade" id="companyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 card-custom">
+                <div class="modal-header bg-primary-custom">
+                    <h5 class="modal-title" id="modalTitle">Create Company</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="companyForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label text-muted fw-bold">Company Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contact" class="form-label text-muted fw-bold">Contact Info</label>
+                            <input type="text" class="form-control" id="contact" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="headquarters" class="form-label text-muted fw-bold">Headquarters</label>
+                            <input type="text" class="form-control" id="headquarters" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-accent px-4">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.querySelector("#companiesTable tbody");
+        const form = document.getElementById("companyForm");
+        const modal = new bootstrap.Modal(document.getElementById('companyModal'));
+
+        function loadCompanies() {
+            fetch("/api/companies")
+                .then(res => res.json())
+                .then(data => {
+                    tableBody.innerHTML = "";
+                    data.forEach(c => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${c.companyId}</td>
+                            <td class="fw-bold">${c.name}</td>
+                            <td>${c.contact}</td>
+                            <td>${c.headquarters}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-danger px-3 delete-btn" data-id="${c.companyId}">Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            if(confirm("Delete this company?")) {
+                                fetch(`/api/companies/${e.target.dataset.id}`, {method:'DELETE'})
+                                    .then(() => loadCompanies());
+                            }
+                        });
+                    });
+                });
+        }
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const company = {
+                name: form.name.value,
+                contact: form.contact.value,
+                headquarters: form.headquarters.value
+            };
+            fetch("/api/companies", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(company)
+            }).then(() => {
+                form.reset();
+                modal.hide();
+                loadCompanies();
+            });
+        });
+
+        loadCompanies();
+    });
+</script>
+</body>
+</html>

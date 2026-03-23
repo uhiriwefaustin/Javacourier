@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Home')}"></head>
+<body>
+
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<main>
+    <!-- Hero Section -->
+    <div class="bg-primary-custom py-5">
+        <div class="container py-5 text-center">
+            <h1 class="display-4 fw-bold mb-4">Fast, Secure and Reliable Delivery</h1>
+            <p class="lead mb-5 text-light text-opacity-75">Rwandan Local Courier Service is your trusted partner for all package deliveries across the country.</p>
+            <a th:href="@{/login}" class="btn btn-accent btn-lg px-5 py-3 fw-bold rounded-pill">System Access <i class="fa-solid fa-arrow-right ms-2"></i></a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container py-5 my-5">
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <div class="card card-custom h-100 p-4 border-0">
+                    <div class="card-body">
+                        <i class="fa-solid fa-map-location-dot fa-3x text-primary-custom mb-3"></i>
+                        <h4 class="card-title fw-bold">Nationwide Coverage</h4>
+                        <p class="card-text text-muted">We deliver your packages to every corner of Rwanda with our extensive bus route network.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-custom h-100 p-4 border-0">
+                    <div class="card-body">
+                        <i class="fa-solid fa-shield-halved fa-3x text-primary-custom mb-3"></i>
+                        <h4 class="card-title fw-bold">Secure Transport</h4>
+                        <p class="card-text text-muted">Your packages are handled with the highest level of care and security from pickup to drop-off.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-custom h-100 p-4 border-0">
+                    <div class="card-body">
+                        <i class="fa-solid fa-satellite-dish fa-3x text-primary-custom mb-3"></i>
+                        <h4 class="card-title fw-bold">Live Tracking</h4>
+                        <p class="card-text text-muted">Real-time tracking of your packages at every station through our advanced logistics system.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>
