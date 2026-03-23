@@ -13,11 +13,19 @@ public class TrackingService {
     @Autowired
     private TrackingRepository trackingRepository;
 
-    public List<Tracking> getTrackingHistory(Long packageId) {
-        return trackingRepository.findByPkg_PackageIdOrderByTimestampDesc(packageId);
+    public List<Tracking> findAllTracking() {
+        return trackingRepository.findAll();
+    }
+
+    public Tracking findById(Long id) {
+        return trackingRepository.findById(id).orElse(null);
     }
 
     public Tracking saveTracking(Tracking tracking) {
         return trackingRepository.save(tracking);
+    }
+
+    public void deleteTracking(Long id) {
+        trackingRepository.deleteById(id);
     }
 }

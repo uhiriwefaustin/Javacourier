@@ -11,40 +11,129 @@
         <span class="badge bg-danger fs-6">ADMIN ROLE</span>
     </div>
 
-    <div class="row g-4 mb-5">
+    <div class="row g-4">
+        <!-- User Management -->
         <div class="col-md-3">
             <div class="card card-custom h-100 border-0">
                 <div class="card-body text-center">
-                    <i class="fa-solid fa-users fa-3x text-primary-custom mb-2"></i>
-                    <h5 class="card-title">Manage Users</h5>
-                    <a th:href="@{/admin/users}" class="btn btn-sm btn-outline-primary mt-2">View</a>
+                    <i class="fa-solid fa-users-gear fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Users</h5>
+                    <a th:href="@{/admin/users}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
                 </div>
             </div>
         </div>
+
+        <!-- Company Management -->
         <div class="col-md-3">
             <div class="card card-custom h-100 border-0">
                 <div class="card-body text-center">
-                    <i class="fa-solid fa-building fa-3x text-primary-custom mb-2"></i>
-                    <h5 class="card-title">Manage Companies</h5>
-                    <a th:href="@{/admin/companies}" class="btn btn-sm btn-outline-primary mt-2">View</a>
+                    <i class="fa-solid fa-building fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Companies</h5>
+                    <a th:href="@{/admin/companies}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
                 </div>
             </div>
         </div>
+
+        <!-- Client Management -->
         <div class="col-md-3">
             <div class="card card-custom h-100 border-0">
                 <div class="card-body text-center">
-                    <i class="fa-solid fa-box fa-3x text-primary-custom mb-2"></i>
-                    <h5 class="card-title">Manage Packages</h5>
-                    <a href="#" class="btn btn-sm btn-outline-primary mt-2">View</a>
+                    <i class="fa-solid fa-user-tie fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Clients</h5>
+                    <a th:href="@{/admin/clients}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
                 </div>
             </div>
         </div>
+
+        <!-- Receiver Management -->
         <div class="col-md-3">
             <div class="card card-custom h-100 border-0">
                 <div class="card-body text-center">
-                    <i class="fa-solid fa-clipboard-list fa-3x text-primary-custom mb-2"></i>
-                    <h5 class="card-title">Audit Logs</h5>
-                    <a href="#" class="btn btn-sm btn-outline-primary mt-2">View</a>
+                    <i class="fa-solid fa-user-group fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Receivers</h5>
+                    <a th:href="@{/admin/receivers}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logistic Tables -->
+        <div class="col-md-3">
+            <div class="card card-custom h-100 border-0">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-layer-group fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Package Types</h5>
+                    <a th:href="@{/admin/package-types}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom h-100 border-0">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-route fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Bus Routes</h5>
+                    <a th:href="@{/admin/bus-routes}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom h-100 border-0">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-door-open fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Stations</h5>
+                    <a th:href="@{/admin/stations}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom h-100 border-0">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-id-card fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Drivers</h5>
+                    <a th:href="@{/admin/drivers}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operation Tables -->
+        <div class="col-md-3">
+            <div class="card card-custom h-100 border-0">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-box fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Packages</h5>
+                    <a th:href="@{/admin/packages}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom h-100 border-0">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-location-crosshairs fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Tracking</h5>
+                    <a th:href="@{/admin/tracking}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom h-100 border-0">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-circle-exclamation fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Exceptions</h5>
+                    <a th:href="@{/admin/exceptions}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom h-100 border-0">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-credit-card fa-3x text-primary-custom mb-3"></i>
+                    <h5 class="card-title fw-bold">Payments</h5>
+                    <a th:href="@{/admin/payments}" class="btn btn-sm btn-outline-primary mt-2 px-3">Manage</a>
                 </div>
             </div>
         </div>

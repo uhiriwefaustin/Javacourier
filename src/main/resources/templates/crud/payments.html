@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Manage Payments')}"></head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary-custom"><i class="fa-solid fa-credit-card me-2"></i> Manage Payments</h2>
+        <button class="btn btn-accent px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#paymentModal">
+            <i class="fa-solid fa-plus me-1"></i> New Payment Record
+        </button>
+    </div>
+    <div class="card card-custom border-0 p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="paymentsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Package ID</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 card-custom">
+                <div class="modal-header bg-primary-custom">
+                    <h5 class="modal-title">Payment Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="paymentForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Package ID</label>
+                            <input type="number" class="form-control" id="packageId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Amount (RWF)</label>
+                            <input type="number" class="form-control" id="amount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Payment Method</label>
+                            <select class="form-select" id="paymentMethod" required>
+                                <option value="Mobile Money">Mobile Money</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Status</label>
+                            <select class="form-select" id="status" required>
+                                <option value="PAID">PAID</option>
+                                <option value="PENDING">PENDING</option>
+                                <option value="FAILED">FAILED</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-accent px-4">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.querySelector("#paymentsTable tbody");
+        const form = document.getElementById("paymentForm");
+        const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+
+        function load() {
+            fetch("/api/payments").then(res => res.json()).then(data => {
+                tableBody.innerHTML = "";
+                data.forEach(p => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${p.paymentId}</td>
+                        <td>${p.pkg ? p.pkg.packageId : 'N/A'}</td>
+                        <td class="fw-bold">${p.amount} RWF</td>
+                        <td>${p.paymentMethod}</td>
+                        <td><span class="badge bg-success">${p.status}</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-danger px-3 delete-btn" data-id="${p.paymentId}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if(confirm("Delete this record?")) {
+                            fetch("/api/payments/" + e.target.dataset.id, {method:'DELETE'}).then(() => load());
+                        }
+                    });
+                });
+            });
+        }
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const data = { 
+                pkg: { packageId: form.packageId.value },
+                amount: form.amount.value,
+                paymentMethod: form.paymentMethod.value,
+                status: form.status.value
+            };
+            fetch("/api/payments", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }).then(() => { form.reset(); modal.hide(); load(); });
+        });
+        load();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Manage Packages')}"></head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary-custom"><i class="fa-solid fa-box me-2"></i> Manage Packages</h2>
+        <button class="btn btn-accent px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#pkgModal">
+            <i class="fa-solid fa-plus me-1"></i> New Package
+        </button>
+    </div>
+    <div class="card card-custom border-0 p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="pkgsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Sender</th>
+                        <th>Receiver</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="pkgModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 card-custom">
+                <div class="modal-header bg-primary-custom">
+                    <h5 class="modal-title">Package Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="pkgForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Sender (Client ID)</label>
+                                <input type="number" class="form-control" id="senderId" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Receiver ID</label>
+                                <input type="number" class="form-control" id="receiverId" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Company ID</label>
+                                <input type="number" class="form-control" id="companyId" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Route ID</label>
+                                <input type="number" class="form-control" id="routeId" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Driver ID</label>
+                                <input type="number" class="form-control" id="driverId" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Package Type ID</label>
+                                <input type="number" class="form-control" id="typeId" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Status</label>
+                                <select class="form-select" id="status" required>
+                                    <option value="PENDING">PENDING</option>
+                                    <option value="PICKED_UP">PICKED_UP</option>
+                                    <option value="IN_TRANSIT">IN_TRANSIT</option>
+                                    <option value="DELIVERED">DELIVERED</option>
+                                    <option value="CANCELLED">CANCELLED</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-accent px-4">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.querySelector("#pkgsTable tbody");
+        const form = document.getElementById("pkgForm");
+        const modal = new bootstrap.Modal(document.getElementById('pkgModal'));
+
+        function load() {
+            fetch("/api/packages").then(res => res.json()).then(data => {
+                tableBody.innerHTML = "";
+                data.forEach(p => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${p.packageId}</td>
+                        <td>${p.sender ? p.sender.name : 'N/A'}</td>
+                        <td>${p.receiver ? p.receiver.name : 'N/A'}</td>
+                        <td><span class="badge bg-info">${p.status}</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-danger px-3 delete-btn" data-id="${p.packageId}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if(confirm("Delete this package?")) {
+                            fetch("/api/packages/" + e.target.dataset.id, {method:'DELETE'}).then(() => load());
+                        }
+                    });
+                });
+            });
+        }
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const data = { 
+                sender: { clientId: form.senderId.value },
+                receiver: { receiverId: form.receiverId.value },
+                company: { companyId: form.companyId.value },
+                route: { routeId: form.routeId.value },
+                driver: { driverId: form.driverId.value },
+                type: { typeId: form.typeId.value },
+                status: form.status.value
+            };
+            fetch("/api/packages", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }).then(() => { form.reset(); modal.hide(); load(); });
+        });
+        load();
+    });
+</script>
+</body>
+</html>

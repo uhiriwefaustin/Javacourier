@@ -22,4 +22,54 @@ public class AdminController {
     public String manageCompanies() {
         return "crud/companies";
     }
+
+    @GetMapping("/clients")
+    public String manageClients() {
+        return "crud/clients";
+    }
+
+    @GetMapping("/receivers")
+    public String manageReceivers() {
+        return "crud/receivers";
+    }
+
+    @GetMapping("/package-types")
+    public String managePackageTypes() {
+        return "crud/package-types";
+    }
+
+    @GetMapping("/bus-routes")
+    public String manageBusRoutes() {
+        return "crud/bus-routes";
+    }
+
+    @GetMapping("/stations")
+    public String manageStations() {
+        return "crud/stations";
+    }
+
+    @GetMapping("/drivers")
+    public String manageDrivers() {
+        return "crud/drivers";
+    }
+
+    @GetMapping("/packages")
+    public String managePackages() {
+        return "crud/packages";
+    }
+
+    @GetMapping("/tracking")
+    public String manageTracking() {
+        return "crud/tracking";
+    }
+
+    @GetMapping("/exceptions")
+    public String manageExceptions() {
+        return "crud/exceptions";
+    }
+
+    @GetMapping("/payments")
+    public String managePayments() {
+        return "crud/payments";
+    }
 }

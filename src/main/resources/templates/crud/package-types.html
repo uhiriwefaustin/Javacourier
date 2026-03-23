@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Manage Package Types')}"></head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary-custom"><i class="fa-solid fa-layer-group me-2"></i> Manage Package Types</h2>
+        <button class="btn btn-accent px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#typeModal">
+            <i class="fa-solid fa-plus me-1"></i> New Type
+        </button>
+    </div>
+    <div class="card card-custom border-0 p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="typesTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Type Name</th>
+                        <th>Description</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="typeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 card-custom">
+                <div class="modal-header bg-primary-custom">
+                    <h5 class="modal-title">Package Type Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="typeForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Type Name</label>
+                            <input type="text" class="form-control" id="typeName" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea class="form-control" id="description" rows="2" required></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-accent px-4">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.querySelector("#typesTable tbody");
+        const form = document.getElementById("typeForm");
+        const modal = new bootstrap.Modal(document.getElementById('typeModal'));
+
+        function load() {
+            fetch("/api/package-types").then(res => res.json()).then(data => {
+                tableBody.innerHTML = "";
+                data.forEach(t => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${t.typeId}</td>
+                        <td class="fw-bold">${t.typeName}</td>
+                        <td>${t.description}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-danger px-3 delete-btn" data-id="${t.typeId}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if(confirm("Delete this package type?")) {
+                            fetch("/api/package-types/" + e.target.dataset.id, {method:'DELETE'}).then(() => load());
+                        }
+                    });
+                });
+            });
+        }
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const data = { typeName: form.typeName.value, description: form.description.value };
+            fetch("/api/package-types", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }).then(() => { form.reset(); modal.hide(); load(); });
+        });
+        load();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Manage Clients')}"></head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary-custom"><i class="fa-solid fa-user-tie me-2"></i> Manage Clients</h2>
+        <button class="btn btn-accent px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#clientModal">
+            <i class="fa-solid fa-plus me-1"></i> New Client
+        </button>
+    </div>
+    <div class="card card-custom border-0 p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="clientsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="clientModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 card-custom">
+                <div class="modal-header bg-primary-custom">
+                    <h5 class="modal-title">Client Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="clientForm">
+                        <input type="hidden" id="clientId">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Phone</label>
+                            <input type="text" class="form-control" id="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Address</label>
+                            <textarea class="form-control" id="address" rows="2" required></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-accent px-4">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.querySelector("#clientsTable tbody");
+        const form = document.getElementById("clientForm");
+        const modal = new bootstrap.Modal(document.getElementById('clientModal'));
+
+        function load() {
+            fetch("/api/clients").then(res => res.json()).then(data => {
+                tableBody.innerHTML = "";
+                data.forEach(c => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${c.clientId}</td>
+                        <td class="fw-bold">${c.name}</td>
+                        <td>${c.phone}</td>
+                        <td>${c.email}</td>
+                        <td>${c.address}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-danger px-3 delete-btn" data-id="${c.clientId}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if(confirm("Delete this client?")) {
+                            fetch("/api/clients/" + e.target.dataset.id, {method:'DELETE'}).then(() => load());
+                        }
+                    });
+                });
+            });
+        }
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const data = { name: form.name.value, phone: form.phone.value, email: form.email.value, address: form.address.value };
+            fetch("/api/clients", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }).then(() => { form.reset(); modal.hide(); load(); });
+        });
+        load();
+    });
+</script>
+</body>
+</html>

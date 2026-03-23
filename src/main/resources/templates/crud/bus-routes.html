@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Manage Bus Routes')}"></head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary-custom"><i class="fa-solid fa-route me-2"></i> Manage Bus Routes</h2>
+        <button class="btn btn-accent px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#routeModal">
+            <i class="fa-solid fa-plus me-1"></i> New Route
+        </button>
+    </div>
+    <div class="card card-custom border-0 p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="routesTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Company</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                        <th>Duration</th>
+                        <th>Frequency</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="routeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 card-custom">
+                <div class="modal-header bg-primary-custom">
+                    <h5 class="modal-title">Bus Route Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="routeForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Company ID</label>
+                            <input type="number" class="form-control" id="companyId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Departure City</label>
+                            <input type="text" class="form-control" id="departureCity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Arrival City</label>
+                            <input type="text" class="form-control" id="arrivalCity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Duration</label>
+                            <input type="text" class="form-control" id="duration" placeholder="e.g. 3 hours">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Frequency</label>
+                            <input type="text" class="form-control" id="frequency" placeholder="e.g. Daily">
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-accent px-4">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.querySelector("#routesTable tbody");
+        const form = document.getElementById("routeForm");
+        const modal = new bootstrap.Modal(document.getElementById('routeModal'));
+
+        function load() {
+            fetch("/api/bus-routes").then(res => res.json()).then(data => {
+                tableBody.innerHTML = "";
+                data.forEach(r => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${r.routeId}</td>
+                        <td>${r.company ? r.company.name : 'N/A'}</td>
+                        <td class="fw-bold">${r.departureCity}</td>
+                        <td class="fw-bold">${r.arrivalCity}</td>
+                        <td>${r.duration}</td>
+                        <td>${r.frequency}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-danger px-3 delete-btn" data-id="${r.routeId}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if(confirm("Delete this route?")) {
+                            fetch("/api/bus-routes/" + e.target.dataset.id, {method:'DELETE'}).then(() => load());
+                        }
+                    });
+                });
+            });
+        }
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const data = { 
+                company: { companyId: form.companyId.value },
+                departureCity: form.departureCity.value,
+                arrivalCity: form.arrivalCity.value,
+                duration: form.duration.value,
+                frequency: form.frequency.value
+            };
+            fetch("/api/bus-routes", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }).then(() => { form.reset(); modal.hide(); load(); });
+        });
+        load();
+    });
+</script>
+</body>
+</html>

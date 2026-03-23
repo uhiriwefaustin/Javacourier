@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Manage Exceptions')}"></head>
+<body>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary-custom"><i class="fa-solid fa-circle-exclamation me-2"></i> Manage Exceptions</h2>
+        <button class="btn btn-accent px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#exceptionModal">
+            <i class="fa-solid fa-plus me-1"></i> New Exception
+        </button>
+    </div>
+    <div class="card card-custom border-0 p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="exceptionsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Package ID</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exceptionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 card-custom">
+                <div class="modal-header bg-primary-custom">
+                    <h5 class="modal-title">Exception Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="exceptionForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Package ID</label>
+                            <input type="number" class="form-control" id="packageId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Reason</label>
+                            <textarea class="form-control" id="reason" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Resolution Status</label>
+                            <input type="text" class="form-control" id="resolutionStatus" required placeholder="e.g. Investigating">
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-accent px-4">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.querySelector("#exceptionsTable tbody");
+        const form = document.getElementById("exceptionForm");
+        const modal = new bootstrap.Modal(document.getElementById('exceptionModal'));
+
+        function load() {
+            fetch("/api/exceptions").then(res => res.json()).then(data => {
+                tableBody.innerHTML = "";
+                data.forEach(ex => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${ex.exceptionId}</td>
+                        <td>${ex.pkg ? ex.pkg.packageId : 'N/A'}</td>
+                        <td>${ex.reason}</td>
+                        <td><span class="badge bg-warning text-dark">${ex.resolutionStatus}</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-danger px-3 delete-btn" data-id="${ex.exceptionId}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if(confirm("Delete this exception?")) {
+                            fetch("/api/exceptions/" + e.target.dataset.id, {method:'DELETE'}).then(() => load());
+                        }
+                    });
+                });
+            });
+        }
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const data = { 
+                pkg: { packageId: form.packageId.value },
+                reason: form.reason.value,
+                resolutionStatus: form.resolutionStatus.value
+            };
+            fetch("/api/exceptions", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }).then(() => { form.reset(); modal.hide(); load(); });
+        });
+        load();
+    });
+</script>
+</body>
+</html>
